@@ -1,6 +1,6 @@
 Spaceship player;
 Star[] stars = new Star[100];
-Asteroid[] asteroids = new Asteroid[10];
+//Asteroid[] asteroids = new Asteroid[10];
 boolean cw,ccw,f,b;
 
 public void setup() 
@@ -11,9 +11,9 @@ public void setup()
   for(int i = 0; i<stars.length; i++){
     stars[i] = new Star();
   }
-  for(int i = 0; i<asteroids.length; i++){
-    asteroids[i] = new Asteroid();
-  }
+  //for(int i = 0; i<asteroids.length; i++){
+  //  asteroids[i] = new Asteroid();
+  //}
 }
 
 public void draw() 
@@ -29,11 +29,11 @@ public void draw()
   player.move();
   player.show();
   
-  for(int i = 0; i<asteroids.length; i++){
-    asteroids[i].move();
-    asteroids[i].show();
-    checkCollision(i);
-  }
+  //for(int i = 0; i<asteroids.length; i++){
+  //  asteroids[i].move();
+  //  asteroids[i].show();
+  //  checkCollision(i);
+  //}
 }
 
 public void checkCollision(int i){
