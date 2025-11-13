@@ -1,6 +1,6 @@
 Spaceship player;
 Star[] stars = new Star[100];
-//Asteroid[] asteroids = new Asteroid[10];
+ArrayList <Asteroid> asteroids = new ArrayList<Asteroid>();
 boolean cw,ccw,f,b;
 
 public void setup() 
@@ -11,9 +11,9 @@ public void setup()
   for(int i = 0; i<stars.length; i++){
     stars[i] = new Star();
   }
-  //for(int i = 0; i<asteroids.length; i++){
-  //  asteroids[i] = new Asteroid();
-  //}
+  for(int i = 0; i<100; i++){
+    asteroids.add(new Asteroid());
+  }
 }
 
 public void draw() 
@@ -29,16 +29,15 @@ public void draw()
   player.move();
   player.show();
   
-  //for(int i = 0; i<asteroids.length; i++){
-  //  asteroids[i].move();
-  //  asteroids[i].show();
-  //  checkCollision(i);
-  //}
-}
-
-public void checkCollision(int i){
-  if(sqrt( sq(asteroids[i].getX()-player.getX()) + sq(asteroids[i].getY() - player.getY()) ) < 20){
-    asteroids[i] = new Asteroid();
+  for(int i = 0; i<asteroids.size(); i++){
+    if(dist(asteroids.get(i).getX(),asteroids.get(i).getY(),player.getX(),player.getY()) < asteroids.get(i).getRadius()+16){
+      asteroids.remove(i);
+      i--;
+    }
+    else{
+      asteroids.get(i).move();
+      asteroids.get(i).show();
+    }
   }
 }
 
