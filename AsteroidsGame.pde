@@ -89,8 +89,7 @@ public void draw()
   checkMovement();
   player.move();
   player.show();
-  println(player.getXspeed());
-  
+
   text(score,10,20);
   text(absX + " " + absY,10,40);
   text(relX + " " + relY,10,60);
@@ -179,3 +178,4 @@ public void checkMovement(){
     bullets.add(new Bullet(player));
   }
 }
+
