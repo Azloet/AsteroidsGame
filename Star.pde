@@ -1,15 +1,30 @@
 class Star //note that this class does NOT extend Floater
 {
-  protected int myX,myY,myColor;
+  private int myX,myY,myColor,relX,relY;
   
-  public Star(){
+  public Star(int rx, int ry){
     myColor = color((int)(Math.random()*360),30,100);
-    myX = (int)(Math.random()*500);
-    myY = (int)(Math.random()*500);
+    myX = rx*250+(int)(Math.random()*250);
+    myY = ry*250+(int)(Math.random()*250);
+    relX = rx;
+    relY = ry;
   }
   
   public void show(){
     fill(myColor);
     rect(myX,myY,2,2);
+  }
+  
+  public int getX(){
+    return (int)myX;
+  }
+  public int getY(){
+    return (int)myY;
+  }
+  public int getRelX(){
+    return relX;
+  }
+  public int getRelY(){
+    return relY;
   }
 }
