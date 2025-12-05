@@ -1,121 +1,94 @@
 Spaceship player;
-ArrayList <Star> stars = new ArrayList<Star>();
-ArrayList <Asteroid> asteroids = new ArrayList<Asteroid>();
-ArrayList <Bullet> bullets = new ArrayList<Bullet>();
-ArrayList <Integer> posX = new ArrayList<Integer>();
-ArrayList <Integer> posY = new ArrayList<Integer>();
+PImage clouds;
+ArrayList <Chunk> chunks = new ArrayList<Chunk>();
+Chunk[] buffer = new Chunk[9];
 boolean cw,ccw,f,b,fire;
-int score,chunkSize;
+int chunkSize;
 
 public void setup() 
 {
-  score = int(loadStrings("save.txt")[0]);
-  
-  size(500,500);
+  size(500,500,P2D);
   colorMode(HSB,360,100,100,100);
   player = new Spaceship();
-  chunkSize = 250;
+  chunks.add(new Chunk(0,0));
+  chunkSize = chunks.get(0).getSize();
 }
 
 public void draw() 
 {
   //your code here
   background(270,10,50);
+  clouds = loadImage("wrapped clouds.jpg");
   noStroke();
   int absX =  player.getX();
   int absY =  player.getY();
   int relX = floor((float)absX/chunkSize);
   int relY = floor((float)absY/chunkSize);
+  
   for(int i = -1; i<=1 ; i++){
     for(int j = -1; j<=1 ; j++){
-      addChunk(relX+i,relY+j);
+      boolean dne = true;
+      int index = 3*(i+1)+(j+1);
+      for(int k = 0; k<chunks.size(); k++){
+        //use existing
+        if(chunks.get(k).getRelX() == relX+i && chunks.get(k).getRelY() == relY+j){
+          buffer[index] = chunks.get(k);
+          dne = false;
+        }
+      }
+      //create new
+      if(dne){
+        Chunk c = new Chunk(relX+i,relY+j);
+        chunks.add(c);
+        buffer[index] = c;
+      }
     }
   }
-
-  pushMatrix();
-  translate(-absX+250,-absY+250);
+  println("player: " + relX,relY, "buffer["+4+"]: " + buffer[4].getRelX(),buffer[4].getRelY());
   
-  for(int i = 0; i<stars.size(); i++){
-    Star s = stars.get(i);
-    if( (s.getRelX()<=relX+1 && s.getRelX()>=relX-1) && (s.getRelY()<=relY+1 && s.getRelY()>=relY-1) ){
+  //main loop
+  pushMatrix();
+  translate(-absX,-absY);
+  for(int i = 0; i<buffer.length; i++){
+    int indexI = buffer[i].getRelX()+1;
+    int indexJ = buffer[i].getRelY()+1;
+    translate(indexI*chunkSize,indexJ*chunkSize);
+    ArrayList <Star> stars = buffer[i].getStars();
+    ArrayList <Asteroid> asteroids = buffer[i].getAsteroids();
+    ArrayList <Bullet> bullets = buffer[i].getBullets();
+    //stars
+    for(int j = 0; j<stars.size(); j++){
+      Star s = stars.get(j);
       s.show();
     }
-  }
-  
-  for(int i = 0; i<asteroids.size(); i++){
-    Asteroid a = asteroids.get(i);
-    if( (a.getRelX()<=relX+1 && a.getRelX()>=relX-1) && (a.getRelY()<=relY+1 && a.getRelY()>=relY-1) ){
-      boolean alive = true;
-      for(int j = 0; j<bullets.size(); j++){
-        Bullet bu = bullets.get(j);
-        if( (bu.getRelX()<=relX+1 && bu.getRelX()>=relX-1) && (bu.getRelY()<=relY+1 && bu.getRelY()>=relY-1) ){
-          if(dist(a.getX(),a.getY(),bu.getX(),bu.getY()) < a.getRadius()+bu.getRadius()){
-            asteroids.remove(i);
-            bullets.remove(j);
-            i--;
-            j=bullets.size();
-            alive = false;
-          }
-        }
+    //asteroids
+    for(int j = 0; j<asteroids.size(); j++){
+      Asteroid a = asteroids.get(j);
+      if(a.move()!=0){
+        
       }
-      if(alive){
-        if(dist(a.getX(),a.getY(),absX,absY) < a.getRadius()+16){
-          asteroids.remove(i);
-          i--;
-          alive = false;
-        }
-        else{
-          a.move();
-          a.show();
-        }
-      }
-      if(!alive){
-        score+=1;
-      }
+      a.show(clouds);
     }
-  }
-  
-  for(int i = 0; i<bullets.size(); i++){
-    Bullet bu = bullets.get(i);
-    if( (bu.getRelX()<=relX+1 && bu.getRelX()>=relX-1) && (bu.getRelY()<=relY+1 && bu.getRelY()>=relY-1) ){
-      bu.move();
-      bu.updateRelPos();
-      bu.show();
+    //bullets
+    for(int j = 0; j<bullets.size(); j++){
+      Bullet b = bullets.get(j);
+      if(b.move()!=0){
+        bullets.remove(j);
+      }
+      b.show();
     }
+    translate(-indexI*chunkSize,-indexJ*chunkSize);
   }
-  
   popMatrix();
   
   checkMovement();
   player.move();
   player.show();
-
-  text(score,10,20);
+  
   text(absX + " " + absY,10,40);
   text(relX + " " + relY,10,60);
-  
-  String[] data = {str(score)};
-  saveStrings("save.txt",data);
 }
 
-public void addChunk(int x, int y){
-  boolean doesntExist = true;
-  for(int i = 0; i<posX.size(); i++){
-    if(posX.get(i) == x && posY.get(i) == y){
-      doesntExist = false;
-    }
-  }
-  if(doesntExist){
-    for(int i = 0; i<250; i++){
-      stars.add(new Star(x,y));
-    }
-    for(int i = 0; i<20; i++){
-      asteroids.add(new Asteroid(x,y));
-    }
-    posX.add(x);
-    posY.add(y);
-  }
-}
 
 
 public void keyPressed(){
@@ -175,7 +148,6 @@ public void checkMovement(){
     player.accelerate(-0.02);
   }
   if(fire){
-    bullets.add(new Bullet(player));
+    buffer[4].getBullets().add(new Bullet(player));
   }
 }
-
