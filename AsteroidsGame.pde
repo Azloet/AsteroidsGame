@@ -44,7 +44,6 @@ public void draw()
       }
     }
   }
-  println("player: " + relX,relY, "buffer["+4+"]: " + buffer[4].getRelX(),buffer[4].getRelY());
   
   //main loop
   pushMatrix();
@@ -64,18 +63,21 @@ public void draw()
     //asteroids
     for(int j = 0; j<asteroids.size(); j++){
       Asteroid a = asteroids.get(j);
-      if(a.move()!=0){
+      a.show(clouds);
+      int move = b.move();
+      if(move!=0){
         
       }
-      a.show(clouds);
     }
     //bullets
     for(int j = 0; j<bullets.size(); j++){
       Bullet b = bullets.get(j);
-      if(b.move()!=0){
-        bullets.remove(j);
-      }
       b.show();
+      int move = b.move();
+      if(move!=0){
+        bullets.remove(j);
+        j--;
+      }
     }
     translate(-indexI*chunkSize,-indexJ*chunkSize);
   }
@@ -88,8 +90,6 @@ public void draw()
   text(absX + " " + absY,10,40);
   text(relX + " " + relY,10,60);
 }
-
-
 
 public void keyPressed(){
   if (keyCode == LEFT||keyCode == 65) {
@@ -151,3 +151,4 @@ public void checkMovement(){
     buffer[4].getBullets().add(new Bullet(player));
   }
 }
+
